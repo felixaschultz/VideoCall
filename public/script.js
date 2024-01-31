@@ -1,4 +1,5 @@
-const socket = io('/')
+const socket = io('/');
+const Peer = require('peerjs');
 const videoGrid = document.getElementById('video-grid')
 const myPeer = new Peer(undefined, {
   host: '/',
@@ -21,17 +22,18 @@ navigator.mediaDevices.getUserMedia({
     })
   })
 
-  socket.on('user-connected', userId => {
+  io.on('user-connected', userId => {
+    console.log("User connected: " + userId)
     connectToNewUser(userId, stream)
   })
 })
 
-socket.on('user-disconnected', userId => {
+io.on('user-disconnected', userId => {
   if (peers[userId]) peers[userId].close()
 })
 
 myPeer.on('open', id => {
-  socket.emit('join-room', ROOM_ID, id)
+  io.emit('join-room', ROOM_ID, id)
 })
 
 function connectToNewUser(userId, stream) {

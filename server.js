@@ -1,8 +1,10 @@
-const express = require('express')
+import express from 'express';
+import http from 'http';
+import { io } from 'socket.io-client';
 const app = express()
-const server = require('http').createServer(app)
-const io = require('socket.io')(server)
-const { v4: uuidV4 } = require('uuid')
+const server = http.createServer(app);
+const socket = io(server);
+import { v4 as uuidV4 } from 'uuid';
 
 app.set('view engine', 'ejs')
 app.use(express.static('public'))
@@ -15,7 +17,7 @@ app.get('/:room', (req, res) => {
   res.render('room', { roomId: req.params.room })
 })
 
-io.on('connection', socket => {
+socket.on('connection', socket => {
   socket.on('join-room', (roomId, userId) => {
     socket.join(roomId)
     socket.to(roomId).broadcast.emit('user-connected', userId)
@@ -26,4 +28,6 @@ io.on('connection', socket => {
   })
 })
 
-server.listen(3000)
+server.listen(3000, () => {
+    console.log("Server is running on port http://localhost:3000")
+})
